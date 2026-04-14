@@ -1,35 +1,41 @@
 # TSwR
 
-# Cross-Entropy Method MPC dla symulowanego samochodu
+# Implementacja i analiza algorytmu sterowania MPPI dla symulowanego samochodu
 
-Projekt realizowany w ramach przedmiotu TSwR.  
-Celem projektu jest implementacja środowiska symulacyjnego samochodu autonomicznego oraz porównanie różnych metod sterowania predykcyjnego w zadaniu śledzenia zadanej trajektorii.
-
-W projekcie porównywane będą trzy podejścia:
-- MPC (Model Predictive Control),
-- CEM-MPC (Cross Entropy Method MPC),
-- iCEM (Improved Cross-Entropy Method).
+Projekt realizowany w ramach przedmiotu TSwR.
+Celem projektu jest implementacja zaawansowanego środowiska symulacyjnego dla autonomicznego samochodu wyścigowego oraz wykorzystanie algorytmu MPPI (Model Predictive Path Integral) do zadania śledzenia optymalnej trajektorii.
 
 # Opis projektu
-Projekt polega na stworzeniu prostego środowiska symulacyjnego samochodu poruszającego się po zadanej trasie oraz implementacji kilku metod sterowania predykcyjnego.  
-Głównym zadaniem będzie śledzenie trajektorii referencyjnej przez pojazd oraz porównanie jakości sterowania i kosztu obliczeniowego różnych podejść.
+Projekt polega na stworzeniu symulatora pojazdu opartego na dynamicznym modelu "rowerowym" (bicycle model) oraz implementacji stochastycznego kontrolera predykcyjnego. W odróżnieniu od klasycznych metod optymalizacji (jak NMPC), MPPI wykorzystuje masywne równoległe próbkowanie trajektorii, co pozwala na efektywne sterowanie w nieliniowych i nietrywialnych reżimach jazdy.  
+Głównym zadaniem jest utrzymanie pojazdu na zadanej ścieżce przy jednoczesnym uwzględnieniu ograniczeń fizycznych, takich jak elipsa tarcia i granice toru.  
 
-# Cel
-- implementacja modelu samochodu i przygtowanie środowiska symulacyjnego,
-- przygotowanie toru / trajektorii referencyjnej,
-- implementacja podstawowego kontrolera pozwalającego na przejazd po trasie,
-- implementacja klasycznego MPC,
-- implementacja CEM-MPC,
-- implementacja iCEM,
-- porównanie jakości sterowania oraz czasu obliczeń dla różnych metod.
+# Model Matematyczny (Fundament)
 
-# Cel na połowe projektu
-- przygotowanie działającego modelu samochodu w symulacji,
-- wizualizacja przejazdu pojazdu,
-- przygotowanie podstawowego kontrolera samochodzika pozwalającego na przejechanie przygotowanej trasy.
+• Układ współrzędnych: Współrzędne krzywoliniowe (curvilinear coordinates) względem ścieżki referencyjnej.  
+• Wektor stanu: x = [n, \mu, v_x, v_y, r, \delta, T]^T  
+• Ograniczenia: Implementacja elipsy tarcia (friction ellipse) ograniczającej sumaryczne siły działające na koła.  
+Stos technologiczny
+• PyTorch: Wykorzystanie tensorów do równoległego obliczania tysięcy próbek trajektorii na GPU/CPU.
+• pytorch-mppi: Biblioteka implementująca logikę algorytmu Model Predictive Path Integral.
+• Numpy / Scipy: Wsparcie dla obliczeń macierzowych i parametrów modelu.
+• Matplotlib: Wizualizacja toru, pojazdu oraz „chmury” próbek generowanych przez MPPI.
 
+# Cel projektu
+1.	Implementacja środowiska: Stworzenie modelu dynamiki pojazdu w oparciu o równania różniczkowe z artykułu.  
+2.	Przygotowanie toru: Definicja trajektorii referencyjnej (np. linia środkowa toru wyścigowego).
+3.	Integracja MPPI: Skonfigurowanie funkcji kosztu (cost function) promującej postęp wzdłuż trasy i karzącej za wypadnięcie z toru.  
+4.	Analiza wydajności: Porównanie wpływu liczby generowanych próbek (samples) na precyzję śledzenia i czas odpowiedzi sterownika.
+5.	Testy graniczne: Badanie stabilności pojazdu przy dużych przyspieszeniach bocznych (at-limit handling).
+
+# Cel na połowę projektu
+• Działający model matematyczny (bicycle model) zaimplementowany w Pythonie.
+• Prosta wizualizacja toru i pozycji pojazdu.
+• Uruchomienie podstawowej pętli sterowania MPPI pozwalającej na przejechanie prostego odcinka trasy.
 # Planowany rezultat końcowy
-- działające środowisko symulacyjne samochodu,
-- Implementacja MPC, CEM-MPC oraz iCEM,
-- zestaw eksperymentów do porównania metod,
-- analiza wyników.
+• W pełni funkcjonalne środowisko symulacyjne.
+• Kontroler MPPI zdolny do stabilnego prowadzenia auta po złożonym torze wyścigowym.
+• Zestaw eksperymentów pokazujących przewagi MPPI w radzeniu sobie z nieliniowościami modelu opon.
+• Analiza kosztu obliczeniowego i porównanie wyników z założeniami teoretycznymi z artykułu.
+# Bibliografia
+1. https://arxiv.org/pdf/2003.04882.pdf
+2.	pytorch-mppi library documentation
